@@ -45,7 +45,7 @@ private:
 
 public:
     IndexBinaryTree() : root(nullptr) {}
-    IndexNode* getRoot() 
+    IndexNode* getRoot()
     {
         return root;
     }
@@ -82,68 +82,81 @@ public:
     IndexNode* insertRec(IndexNode* root, string key, int index)
     {
         if (root == nullptr)
+        {
             return new IndexNode(key, index);
+        }
         if (key < root->key)
+        {
             root->left = insertRec(root->left, key, index);
+        }
         else if (key > root->key)
+        {
             root->right = insertRec(root->right, key, index);
+        }
+
         return root;
     }
+
     IndexNode* searchNode(string key)
     {
         return searchRec(root, key);
     }
+
     IndexNode* searchRec(IndexNode* root, string key)
     {
         if (root == nullptr || root->key == key)
+        {
             return root;
+        }
         if (key < root->key)
+        {
             return searchRec(root->left, key);
+        }
         return searchRec(root->right, key);
     }
-    void deleteNodeByName(const string& songName)
+    void deleteByName(string key) //удаление по имени 
     {
-        root = deleteByName(root, songName);
-        if (root == nullptr) 
-            cout << "Песня с названием '" << songName << "' не найдена." << endl;
+        root = deleteRec(root, key);
     }
-    IndexNode* deleteByName(IndexNode* node, const string& songName)
+    IndexNode* deleteRec(IndexNode* root, string key)
     {
-        if (node == nullptr) 
-            return nullptr;
-        if (songName < node->key) 
-            node->left = deleteByName(node->left, songName);
-        else if (songName > node->key)
-            node->right = deleteByName(node->right, songName);
-        else 
+        if (root == nullptr)
+            return root;
+        if (key < root->key)
+            root->left = deleteRec(root->left, key);
+        else if (key > root->key)
+            root->right = deleteRec(root->right, key);
+        else
         {
-            if (node->left == nullptr)
+            if (root->left == nullptr)
             {
-                IndexNode* temp = node->right;
-                delete node;
+                IndexNode* temp = root->right;
+                delete root;
                 return temp;
             }
-            else if (node->right == nullptr) 
+            else if (root->right == nullptr)
             {
-                IndexNode* temp = node->left;
-                delete node;
+                IndexNode* temp = root->left;
+                delete root;
                 return temp;
             }
-            IndexNode* temp = minValueNode(node->right);
-            node->key = temp->key;
-            node->index = temp->index;
-            node->right = deleteByName(node->right, temp->key);
+            IndexNode* temp = minValueNode(root->right);
+            root->key = temp->key;
+            root->index = temp->index;
+            root->right = deleteRec(root->right, temp->key);
         }
-        return node;
+        return root;
     }
 
     IndexNode* minValueNode(IndexNode* node)
     {
         IndexNode* current = node;
 
-        while (current && current->left != nullptr) {
+        while (current && current->left != nullptr)
+        {
             current = current->left;
         }
+
         return current;
     }
 };
@@ -227,8 +240,8 @@ void searchByName(IndexNode* root, Playlist& playlist, const string& key)  //п�
             cout << "Длительность: " << playlist.tracks[current->index].duration << " секунд" << endl;
             return;
         }
-        if (key < playlist.tracks[current->index].name)      
-            current = current->left; 
+        if (key < playlist.tracks[current->index].name)
+            current = current->left;
         else
             current = current->right;
     }
@@ -240,21 +253,22 @@ int Number(int n1, int n2) {
     bool isValidInput = false;
 
     do {
-        cout << "Введите целое число от " << n1 << " до " << n2 << ": ";
-        if (!(cin >> number)) {
-            cout << "Ошибка: Введите корректное целое число." << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        std::cout << "Введите целое число от " << n1 << " до " << n2 << ": ";
+        if (!(std::cin >> number)) {
+            std::cout << "Ошибка: Введите корректное целое число." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         else {
             if (number < n1 || number > n2) {
-                cout << "Число вне диапазона! Попробуйте снова.\n";
+                std::cout << "Число вне диапазона! Попробуйте снова.\n";
             }
             else {
                 isValidInput = true;
             }
         }
     } while (!isValidInput);
+
     return number;
 }
 
@@ -297,13 +311,8 @@ int main()
                 cout << "1. Напечатать плейлист \n"
                     << "2. Напечатать плейлист в алфавитном порядке по названию песни \n"
                     << "3. Напечатать плейлист по убыванию года выпуска \n"
-                    << "4. Поиск песни по имени итерационно \n"
-                    << "5. Поиск году выпуска по имени рекурсивно \n"
-                    << "6. Изменить название песни \n"
-                    << "7. Изменить год выпуска песни \n"
-                    << "8. Удалить песню по названию \n"
-                    << "9. Выход \n";
-                number = Number(1, 9);
+                    << "4. Поиск песни по имени \n";
+                number = Number(1, 8);
                 switch (number)
                 {
                 case 1: // Напечатать плейлист
@@ -332,7 +341,7 @@ int main()
                     string searchName;
                     cout << "Введите название песни для поиска '" << endl;
                     cin >> searchName;
-                    cout << "\nПоиск песни с именем '" << searchName << "':" << endl;
+                    cout << "Поиск песни с именем '" << searchName << "':" << endl;
                     searchByName(indexTree.searchNode(searchName), Playlist, searchName);
                     break;
                 }
@@ -343,36 +352,27 @@ int main()
                     int releaseDate;
                     cout << "Введите год выпуска песни для поиска '" << endl;
                     releaseDate = Number(1900, 2025);
-                    cout << "\nПоиск песни с годом выпуска '" << releaseDate << "':" << endl;
+                    cout << "Поиск песни с именем '" << releaseDate << "':" << endl;
                     searchByReleaseDate(releaseDate, indexTree.getRoot(), Playlist);
                     break;
                 }
 
-                case 6:    // Изменить название песни
+                case 6:
                 {
                     cout << "Выберите номер песни в плейлисте, для которой хотите изменить название" << endl;
                     int index = Number(1, Playlist.size);
                     cin >> Playlist.tracks[index - 1].name;
                     break;
                 }
-                case 7:   // Изменить год выпуска песни 
+                case 7:
                 {
                     cout << "Выберите номер песни в плейлисте, для которой хотите изменить год выпуска" << endl;
                     int index = Number(1, Playlist.size);
                     Playlist.tracks[index - 1].releaseDate = Number(1900, 2024);
                     break;
                 }
-                case 8:  //Удалить песню по названию
-                {
-                    IndexBinaryTree indexTree;
-                    string songToDelete;
-                    cout << "Введите название песни для удаления '" << endl;
-                    cin >> songToDelete;
-                    indexTree.deleteNodeByName(songToDelete);
-                    break;
                 }
-                }
-            } while (number < 9);
+            } while (number < 6);
             break;
         }
         case 2: //Использовать готовый плейлист 
@@ -399,9 +399,8 @@ int main()
                     << "5. Поиск году выпуска по имени рекурсивно \n"
                     << "6. Изменить название песни \n"
                     << "7. Изменить год выпуска песни \n"
-                    << "8. Удалить песню по названию \n"
-                    << "9. Выход \n";
-                number = Number(1, 9);
+                    << "8. Выход \n";
+                number = Number(1, 8);
                 switch (number)
                 {
                 case 1: // Напечатать плейлист
@@ -430,7 +429,7 @@ int main()
                     string searchName;
                     cout << "Введите название песни для поиска '" << endl;
                     cin >> searchName;
-                    cout << "\nПоиск песни с именем '" << searchName << "':" << endl;
+                    cout << "Поиск песни с именем '" << searchName << "':" << endl;
                     searchByName(indexTree.searchNode(searchName), Playlist, searchName);
                     break;
                 }
@@ -441,40 +440,51 @@ int main()
                     int releaseDate;
                     cout << "Введите год выпуска песни для поиска '" << endl;
                     releaseDate = Number(1900, 2025);
-                    cout << "\nПоиск песни с годом выпуска '" << releaseDate << "':" << endl;
+                    cout << "Поиск песни с именем '" << releaseDate << "':" << endl;
                     searchByReleaseDate(releaseDate, indexTree.getRoot(), Playlist);
                     break;
                 }
 
-                case 6:    // Изменить название песни
+                case 6:
                 {
                     cout << "Выберите номер песни в плейлисте, для которой хотите изменить название" << endl;
                     int index = Number(1, Playlist.size);
-                    cin >> Playlist.tracks[index-1].name;
+                    cin >> Playlist.tracks[index - 1].name;
                     break;
                 }
-                case 7:   // Изменить год выпуска песни 
+                case 7:
                 {
                     cout << "Выберите номер песни в плейлисте, для которой хотите изменить год выпуска" << endl;
                     int index = Number(1, Playlist.size);
-                    Playlist.tracks[index-1].releaseDate = Number(1900, 2024);             
+                    Playlist.tracks[index - 1].releaseDate = Number(1900, 2024);
                     break;
                 }
-                case 8:  //Удалить песню по названию
+                case 8:
                 {
-                    IndexBinaryTree indexTree;
-                    string songToDelete;
-                    cout << "Введите название песни для поиска '" << endl;
-                    cin >> songToDelete;
-                    indexTree.deleteNodeByName(songToDelete);
+                    deleteRec
+                        number = 11;
+                    IndexBinaryTree tree;
+
+                    // Добавим некоторые узлы в бинарное дерево
+                    tree.insertNode("song1", 0);
+                    tree.insertNode("song2", 1);
+                    tree.insertNode("song3", 2);
+                    tree.insertNode("song4", 3);
+
+                    // Удалим запись с ключом "song2"
+                    tree.deleteByKeyName("song2");
                     break;
                 }
                 }
-            } while (number <9);
+            } while (number < 8);
             break;
         }
+
         }
-    } while (number < 3);
+    } while (number < 4);
+
+
+
     return 0;
 }
 
